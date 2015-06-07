@@ -6,12 +6,6 @@ png(filename = "plot2.png", width = 480, height = 480)
 # Load sqldf library to use read.csv.sql to avoid high memory comsumption
 library(sqldf)
 
-# Load GGPlot2 library to plot #2 image.
-library(ggplot2)
-
-# Sorry but I need this as my locale is pt_BR
-daysinweek <- c("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
-
 # The assumption here is that the data set file is at the same directory of the script
 epcds <- read.csv.sql(file = "household_power_consumption.txt", 
                       sql = "select * from file where Date = '1/2/2007' or Date = '2/2/2007'", 
@@ -19,14 +13,17 @@ epcds <- read.csv.sql(file = "household_power_consumption.txt",
                                      "numeric", "numeric", "numeric", "numeric"), sep = ";")
 
 
-# Get correct days of week. First day is Sunday and it is equals 0.
-daycolumn <- daysinweek[as.POSIXlt(as.Date(epcds$Date, "%d/%m/%Y"))$wday + 1]
+# Generate a timestamp that will serve as X axis on plot.
+TSColumn <- strptime(x = paste(epcds$Date, epcds$Time, sep = " "), "%d/%m/%Y %H:%M")
 
-# Now just get a correct set with correct columns
-sset <- cbind(daycolumn, epcds[,c(2:9)])
+# Get correct days of week. First day is Sunday and it is equals 0.
+epcds$Date <- as.POSIXlt(as.Date(epcds$Date, "%d/%m/%Y"))
+
+# Merge new column to original dataset
+epcds <- cbind(TSColumn, epcds)
 
 # Now that we have the data, lets plot!
-hist(epcds$Global_active_power, col = "red")
+plot(epcds$TSColumn, epcds$Global_active_power, type="l", xlab="", ylab="Global Active Power (kilowatts)")
 
 # We need to assure that device is turned off after
 # we finish our job!

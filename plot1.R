@@ -7,6 +7,7 @@ png(filename = "plot1.png", width = 480, height = 480)
 library(sqldf)
 
 # The assumption here is that the data set file is at the same directory of the script
+# To avoid high load on memory we select only the data set that we need.
 epcds <- read.csv.sql(file = "household_power_consumption.txt", 
                       sql = "select * from file where Date = '1/2/2007' or Date = '2/2/2007'", 
                       colClasses = c("character", "character", "numeric", "numeric", "numeric",
@@ -14,7 +15,7 @@ epcds <- read.csv.sql(file = "household_power_consumption.txt",
 
 
 # Now that we have the data, lets plot!
-hist(epcds$Global_active_power, col = "red")
+hist(epcds$Global_active_power, col = "red", main = "Global Active Power", xlab = "Global Active Power (kilowatts)")
 
 # We need to assure that device is turned off after
 # we finish our job!
